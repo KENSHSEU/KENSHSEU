@@ -1,0 +1,145 @@
+import random
+import sys
+import pygame
+
+pygame.init()
+
+# VARIABLES
+WW, WH = 630, 360  # WINDOW WIDTH AND HEIGHT
+block_size = 30    # Block size for the grid
+FONT = pygame.font.Font("DATA/stocky.ttf", block_size * 2)
+Game_over = False
+
+# Setup
+pygame.display.set_caption("SNAKE")
+window = pygame.display.set_mode((WW, WH))
+clock = pygame.time.Clock()
+
+
+class SNAKE:
+    def __init__(self):
+        #snake setup
+        self.x, self.y = block_size, block_size
+        self.xdir = 1
+        self.ydir = 0
+        self.body = [pygame.Rect(self.x-block_size, self.y, block_size, block_size)]
+        self.head = pygame.Rect(self.x, self.y, block_size, block_size)
+        self.dead = False
+
+    def drawSnake(self):
+        for segment in self.body:
+            pygame.draw.rect(window, (0, 250, 0), segment)
+
+        pygame.draw.rect(window, (0, 250, 0), self.head)
+
+    def update(self):
+        global apple
+
+        #checks for collusion
+        for segment in self.body:
+            if self.head.x == segment.x and self.head.y == segment.y:
+                self.dead = True
+            elif self.head.x not in range(0, WW) or self.head.y not in range(0, WH):
+                self.dead = True
+
+        #checks if snake is dead
+        if self.dead:
+            self.x, self.y = block_size, block_size
+            self.xdir = 1
+            self.ydir = 0
+            self.body = [pygame.Rect(self.x - block_size, self.y, block_size, block_size)]
+            self.head = pygame.Rect(self.x, self.y, block_size, block_size)
+            self.dead = False
+            apple = APPLES()
+
+        #moves the snake
+        self.body.append(self.head)
+        for i in range(len(self.body)-1):
+            self.body[i].x, self.body[i].y = self.body[i+1].x, self.body[i+1].y
+
+        self.head.x += self.xdir * block_size
+        self.head.y += self.ydir * block_size
+        self.body.remove(self.head)
+
+    def Input(self):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RIGHT:
+                if self.xdir == -1:
+                    pass
+                else:
+                    self.xdir = 1
+                    self.ydir = 0
+            elif event.key == pygame.K_LEFT:
+                if self.xdir == 1:
+                    pass
+                else:
+                    self.xdir = -1
+                    self.ydir = 0
+            elif event.key == pygame.K_UP:
+                if self.ydir == 1:
+                    pass
+                else:
+                    self.xdir = 0
+                    self.ydir = -1
+            elif event.key == pygame.K_DOWN:
+                if self.ydir == -1:
+                    pass
+                else:
+                    self.xdir = 0
+                    self.ydir = 1
+
+    def Snake(self):
+        self.drawSnake()
+        self.update()
+
+class APPLES:
+    def __init__(self):
+        self.x = int(random.randint(0, WW)/block_size) * block_size
+        self.y = int(random.randint(0, WH)/block_size) * block_size
+        self.oldx = self.x
+        self.oldy = self.y
+        self.apple = pygame.Rect(self.x, self.y, block_size, block_size)
+    def drawapple(self):
+        pygame.draw.rect(window, (250, 0, 0), self.apple)
+
+    def Apple(self):
+        self.drawapple()
+
+    def APLcheck(self):
+        if self.oldx == self.x and self.oldy == self.y:
+            APPLES()
+
+apple = APPLES()
+snake = SNAKE()
+
+def drawGrid():
+    for x in range(0, WW, block_size):
+        for y in range(0, WH, block_size):
+            rect = pygame.Rect(x, y, block_size, block_size)
+            pygame.draw.rect(window, (250, 250, 250), rect, 1)
+
+def Score():
+    score = FONT.render("1", True, (255, 255, 255))
+    score_rect = score.get_rect(center=(WW/2, WH/20))
+    score = FONT.render(f"{len(snake.body)+1}", True, (255, 255, 255))
+    window.blit(score, score_rect)
+
+# Start the game
+while True:
+    window.fill((10, 10, 10))
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        snake.Input()
+
+    if snake.head.x == apple.x and snake.head.y == apple.y:
+        snake.body.append(pygame.Rect(snake.head.x+1, snake.head.y+1, block_size, block_size))
+        apple = APPLES()
+        apple.APLcheck()
+    drawGrid()
+    snake.Snake()
+    apple.Apple()
+    Score()
+    pygame.display.update()
+    clock.tick(6
