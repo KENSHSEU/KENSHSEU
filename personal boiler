@@ -1,0 +1,14 @@
+import pygame
+import sys
+
+WW, WH = 
+window = pygame.display.set_mode((WW, WH))
+pygame.display.set_caption("")
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    pygame.display.update()
