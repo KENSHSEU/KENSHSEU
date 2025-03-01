@@ -1,0 +1,76 @@
+import time
+
+import numpy as np
+import pygame
+import sys
+
+#General Set up
+WW, WH = 900, 900
+BG = (10, 10, 10)
+Color_Grid = (40, 40, 40)
+window = pygame.display.set_mode((WW, WH))
+pygame.display.set_caption("Game Of Life")
+
+#Cells
+cells_alive = (250, 250, 250)
+cell_dead = (200, 0, 0)
+
+def update(cells, size, progress=False):
+    update_cells = np.zeros((cells.shape[0], cells.shape[1]))
+    for row, col in np.ndindex(cells.shape):
+        alive = np.sum(cells[row - 1:row + 2, col - 1:col + 2]) - cells[row, col]
+        if cells[row, col] == 0:
+            color = BG
+        else:
+            color = cells_alive
+
+        if cells[row, col] == 1:
+            if alive < 2 or alive > 3:
+                if progress:
+                    color = cell_dead
+            else:
+                update_cells[row, col] = 1
+                if progress:
+                    color = cells_alive
+        else:
+            if alive == 3:
+                update_cells[row, col] = 1
+                if progress:
+                    color = cells_alive
+
+        pygame.draw.rect(window, color, (col * size, row * size, size - 1, size - 1))
+
+    return update_cells
+
+cells = np.zeros((90, 90))
+window.fill(Color_Grid)
+update(cells, 10)
+pygame.display.update()
+pygame.display.flip()
+
+running = False
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                running = not running
+                update(cells, 10)
+                pygame.display.update()
+        if pygame.mouse.get_pressed()[0]:
+            pos = pygame.mouse.get_pos()
+            cells[pos[1] // 10, pos[0] // 10] = 1
+            update(cells, 10)
+            pygame.display.update()
+
+    window.fill(Color_Grid)
+
+    if running:
+        cells = update(cells, 10, progress=True)
+        pygame.display.update()
+
+    time.sleep(0.001)
+    window.fill(Color_Grid)
