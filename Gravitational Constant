@@ -1,0 +1,107 @@
+import pygame
+import sys
+import math
+
+WW, WH = 1500, 900
+BG = 0, 0, 0
+window = pygame.display.set_mode((WW, WH))
+pygame.display.set_caption("Physics")
+clock = pygame.time.Clock()
+
+#Earth Gravity
+EG = 9.8
+
+#Gravitational constant
+G = 1
+#Formula
+#F = G * ((mass1 * mass2) / r^2)
+#D = _/(x1 - x2)^2 + (y1 - y2)^2
+
+class Object_1:
+    def __init__(self, mass1, x1, y1, radius1, mass2, x2, y2, radius2):
+        self.m1 = mass1
+        self.x1 = x1
+        self.y1 = y1
+        self.r1 = radius1
+        self.dy1 = 0
+        self.dx1 = 0
+        self.m2 = mass2
+        self.x2 = x2
+        self.y2 = y2
+        self.r2 = radius2
+        self.dy2 = 0
+        self.dx2 = 0
+
+        self.fx1 = 0
+        self.fy1 = 0
+        self.fx2 = 0
+        self.fy2 = 0
+
+    def update(self):
+        self.object1()
+        self.object2()
+        self.Maths()
+        self.apply_force()
+        self.update_position()
+
+    def Maths(self):
+        #Calculate the Distance
+        D = math.sqrt(math.pow(self.x1 - self.x2, 2) + math.pow(self.y1 - self.y2, 2))
+
+        #Calculate the G Force
+        F = G * ((self.m1 * self.m2) / D)
+
+        #Calculate the Acceleration
+        Acc1 = F / self.m1
+        Acc2 = F / self.m2
+
+        #Calculate the direction of the force
+        dx = self.x2 - self.x1
+        dy = self.y2 - self.y1
+        angle = math.atan2(dy, dx)
+
+        #Decompose the forces into x and y components for both objects
+        self.fx1 = Acc1 * math.cos(angle)
+        self.fy1 = Acc1 * math.sin(angle)
+
+        self.fx2 = -Acc2 * math.cos(angle)
+        self.fy2 = -Acc2 * math.sin(angle)
+
+    #Applies the force
+    def apply_force(self):
+        self.dx1 += self.fx1
+        self.dy1 += self.fy1
+
+        self.dx2 += self.fx2
+        self.dy2 += self.fy2
+
+    def update_position(self):
+        # Updates the position
+        self.x1 += self.dx1
+        self.y1 += self.dy1
+
+        self.x2 += self.dx2
+        self.y2 += self.dy2
+
+    def object1(self):
+        pygame.draw.circle(window, (255, 255, 255), (self.x1, int(self.y1)), self.r1, 100)
+
+    def object2(self):
+        pygame.draw.circle(window, (255, 255, 255), (self.x2, int(self.y2)), self.r2, 100)
+
+    def draw_object(self):
+        self.update()
+
+
+O1 = Object_1(10, 250, 200, 10, 100, 1250, 450, 100)
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    window.fill(BG)
+    O1.draw_object()
+    clock.tick(60)
+    pygame.display.update()
