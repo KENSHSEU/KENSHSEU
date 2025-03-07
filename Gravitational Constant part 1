@@ -1,6 +1,6 @@
 import pygame
 import sys
-import math
+import math as M
 
 WW, WH = 1500, 900
 BG = 0, 0, 0
@@ -19,34 +19,29 @@ G = 1
 
 class Object_1:
     def __init__(self, mass1, x1, y1, radius1, mass2, x2, y2, radius2):
-        self.m1 = mass1
-        self.x1 = x1
-        self.y1 = y1
-        self.r1 = radius1
-        self.dy1 = 0
-        self.dx1 = 0
-        self.m2 = mass2
-        self.x2 = x2
-        self.y2 = y2
-        self.r2 = radius2
-        self.dy2 = 0
-        self.dx2 = 0
+        #Object 1
+        self.m1 = mass1 #MASS
+        self.x1 = x1 #X POSITION
+        self.y1 = y1 #Y POSITION
+        self.r1 = radius1 #OBJECT RADIUS
+        self.dy1 = 0 #DISPLACEMENT Y
+        self.dx1 = 0 #DISPLACEMENT X
+        self.fx1 = 0 #FORCE X
+        self.fy1 = 0 #FORCE Y
 
-        self.fx1 = 0
-        self.fy1 = 0
-        self.fx2 = 0
-        self.fy2 = 0
-
-    def update(self):
-        self.object1()
-        self.object2()
-        self.Maths()
-        self.apply_force()
-        self.update_position()
+        #Object 2
+        self.m2 = mass2 #MASS
+        self.x2 = x2 #X POSITION
+        self.y2 = y2 #Y POSITION
+        self.r2 = radius2 #OBJECT RADIUS
+        self.dy2 = 0 #DISPLACEMENT Y
+        self.dx2 = 0 #DISPLACEMENT X
+        self.fx2 = 0 #FORCE X
+        self.fy2 = 0 #FORCE Y
 
     def Maths(self):
         #Calculate the Distance
-        D = math.sqrt(math.pow(self.x1 - self.x2, 2) + math.pow(self.y1 - self.y2, 2))
+        D = M.sqrt(M.pow(self.x1 - self.x2, 2) + M.pow(self.y1 - self.y2, 2))
 
         #Calculate the G Force
         F = G * ((self.m1 * self.m2) / D)
@@ -58,14 +53,14 @@ class Object_1:
         #Calculate the direction of the force
         dx = self.x2 - self.x1
         dy = self.y2 - self.y1
-        angle = math.atan2(dy, dx)
+        angle = M.atan2(dy, dx)
 
         #Decompose the forces into x and y components for both objects
-        self.fx1 = Acc1 * math.cos(angle)
-        self.fy1 = Acc1 * math.sin(angle)
+        self.fx1 = Acc1 * M.cos(angle)
+        self.fy1 = Acc1 * M.sin(angle)
 
-        self.fx2 = -Acc2 * math.cos(angle)
-        self.fy2 = -Acc2 * math.sin(angle)
+        self.fx2 = -Acc2 * M.cos(angle)
+        self.fy2 = -Acc2 * M.sin(angle)
 
     #Applies the force
     def apply_force(self):
@@ -75,8 +70,8 @@ class Object_1:
         self.dx2 += self.fx2
         self.dy2 += self.fy2
 
+    # Updates the position
     def update_position(self):
-        # Updates the position
         self.x1 += self.dx1
         self.y1 += self.dy1
 
@@ -84,22 +79,29 @@ class Object_1:
         self.y2 += self.dy2
 
     def object1(self):
-        pygame.draw.circle(window, (255, 255, 255), (self.x1, int(self.y1)), self.r1, 100)
+        pygame.draw.circle(window, (255, 0, 0), (self.x1, int(self.y1)), self.r1, 100)
 
     def object2(self):
-        pygame.draw.circle(window, (255, 255, 255), (self.x2, int(self.y2)), self.r2, 100)
+        pygame.draw.circle(window, (0, 0, 255), (self.x2, int(self.y2)), self.r2, 100)
+
+    def update(self):
+        self.object1()
+        self.object2()
+        self.Maths()
+        self.apply_force()
+        self.update_position()
 
     def draw_object(self):
         self.update()
 
-
-O1 = Object_1(10, 250, 200, 10, 100, 1250, 450, 100)
+O1 = Object_1(0, 200, 250, 0, 0, 1300, 250, 0)
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+
 
     window.fill(BG)
     O1.draw_object()
