@@ -94,7 +94,7 @@ class Object_1:
     def draw_object(self):
         self.update()
 
-O1 = Object_1(0, 200, 250, 0, 0, 1300, 250, 0)
+O1 = Object_1(100, 200, 250, 100, 100, 1300, 250, 100)
 
 while True:
     for event in pygame.event.get():
